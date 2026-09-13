@@ -1,0 +1,12 @@
+{
+  "name": "Apps by nij-621",
+  "short_name": "Apps",
+  "start_url": "./",
+  "display": "browser",
+  "background_color": "#f8f7f3",
+  "theme_color": "#f8f7f3",
+  "icons": [
+    { "src": "icons/app-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icons/app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
