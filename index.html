@@ -5,38 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Apps by nij-621</title>
 <meta name="description" content="일상에서 필요해서 직접 만든 작은 웹앱 모음. 설치 없이 링크로 열립니다.">
-<meta name="theme-color" content="#f7f6f2">
+<meta name="theme-color" content="#f8f7f3">
 <link rel="icon" href="icons/harudoing.png">
 <link rel="apple-touch-icon" href="icons/harudoing.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Gothic+A1:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Gothic+A1:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #f7f6f2;
+    --paper: #f8f7f3;
     --card: #ffffff;
-    --ink: #1b1b19;
-    --ink-2: #4d4c48;
-    --muted: #7c7b75;
-    --line: #e6e4de;
-    --line-2: #d6d3cb;
-    --chip: #f1efe9;
+    --ink: #1a1a18;
+    --ink-2: #4b4a46;
+    --muted: #7d7c76;
+    --line: #e7e5df;
+    --line-2: #d5d2ca;
+    --chip: #f1f0ea;
     --mark: #fff27a;
-    --shadow: 0 1px 2px rgba(20, 18, 10, .04), 0 8px 24px -12px rgba(20, 18, 10, .12);
-    --r: 18px;
+    --dock: rgba(255,255,255,.62);
+    --shadow: 0 1px 2px rgba(20,18,10,.04), 0 10px 28px -14px rgba(20,18,10,.14);
+    --shadow-icon: 0 1px 1px rgba(20,18,10,.06), 0 6px 14px -6px rgba(20,18,10,.28);
+    --r: 20px;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --font-display: "Bricolage Grotesque", "Gothic A1", system-ui, sans-serif;
+    --font-body: "Gothic A1", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", "Gothic A1", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --paper: #16161a;
-      --card: #1f1f24;
-      --ink: #f0efe9;
-      --ink-2: #c9c8c1;
-      --muted: #8f8e88;
-      --line: #2c2c33;
-      --line-2: #3a3a42;
-      --chip: #2a2a30;
-      --mark: #5d5518;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+      --paper: #151517;
+      --card: #1e1e22;
+      --ink: #f1f0ea;
+      --ink-2: #c8c7c0;
+      --muted: #8d8c86;
+      --line: #2b2b30;
+      --line-2: #3b3b42;
+      --chip: #28282d;
+      --mark: #5f5714;
+      --dock: rgba(30,30,34,.7);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+      --shadow-icon: 0 1px 1px rgba(0,0,0,.4), 0 6px 14px -6px rgba(0,0,0,.7);
     }
   }
   * { box-sizing: border-box; }
@@ -45,58 +53,131 @@
     margin: 0;
     background: var(--paper);
     color: var(--ink);
-    font-family: "Gothic A1", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 15px;
     line-height: 1.6;
     word-break: keep-all;
-    padding: max(20px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
+    padding: max(20px, env(safe-area-inset-top)) 20px max(48px, env(safe-area-inset-bottom));
   }
+  html[lang="en"] body { word-break: normal; }
   a { color: inherit; }
-  .wrap { max-width: 980px; margin: 0 auto; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  /* ---- language swap: blur-masked crossfade ---- */
+  .i18n { transition: opacity 150ms ease, filter 150ms ease; }
+  body.swapping .i18n { opacity: .55; filter: blur(2px); }
 
   /* ---- header ---- */
-  header { padding: 28px 0 24px; }
+  header { padding: 24px 0 8px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 28px; }
   .eyebrow {
-    font-family: "Bricolage Grotesque", "Gothic A1", sans-serif;
-    font-weight: 500; font-size: 13px; letter-spacing: .02em;
-    color: var(--muted); margin: 0 0 10px;
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em;
+    color: var(--muted); margin: 0;
   }
+  .lang {
+    position: relative; display: inline-flex; padding: 3px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow);
+  }
+  .lang .thumb {
+    position: absolute; top: 3px; left: 0; height: calc(100% - 6px); width: 0;
+    border-radius: 999px; background: var(--ink);
+    transition: transform 180ms var(--ease-out), width 180ms var(--ease-out);
+  }
+  .lang button {
+    position: relative; z-index: 1;
+    appearance: none; border: 0; background: transparent; cursor: pointer;
+    font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .03em;
+    color: var(--muted); padding: 6px 11px; border-radius: 999px; line-height: 1;
+    transition: color 180ms ease, transform 120ms var(--ease-out);
+  }
+  .lang button[aria-pressed="true"] { color: var(--paper); }
+  .lang button:active { transform: scale(.96); }
+  .lang button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
   h1 {
-    font-family: "Bricolage Grotesque", "Gothic A1", sans-serif;
-    font-weight: 700; font-size: clamp(32px, 6vw, 48px);
-    line-height: 1.05; letter-spacing: -.02em; margin: 0 0 16px;
+    font-family: var(--font-display);
+    font-weight: 800; font-size: clamp(34px, 6.4vw, 54px);
+    line-height: 1.02; letter-spacing: -.028em; margin: 0 0 14px;
+    font-variation-settings: "opsz" 96;
   }
-  h1 mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 .06em; }
-  .lede { max-width: 560px; margin: 0; color: var(--ink-2); font-size: 16px; }
+  h1 mark { background: linear-gradient(transparent 58%, var(--mark) 58%); color: inherit; padding: 0 .04em; }
+  .lede { max-width: 540px; margin: 0; color: var(--ink-2); font-size: 16px; }
+
+  /* ---- dock (signature) ---- */
+  .dock-wrap { margin: 26px 0 6px; display: flex; flex-direction: column; align-items: flex-start; }
+  .dock {
+    display: inline-flex; gap: 6px; padding: 12px 12px 10px;
+    border-radius: 26px; border: 1px solid var(--line);
+    background: var(--dock); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    max-width: 100%; overflow-x: auto; scrollbar-width: none;
+  }
+  .dock::-webkit-scrollbar { display: none; }
+  @media (max-width: 720px) { .dock { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); } }
+  .dock a {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    width: 76px; flex: none; text-decoration: none; color: var(--ink-2);
+    font-size: 11px; line-height: 1; letter-spacing: -.01em;
+    transition: transform 120ms var(--ease-out);
+  }
+  .dock a:active { transform: scale(.94); }
+  .dock a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 12px; }
+  .dock img {
+    width: 58px; height: 58px; border-radius: 15px; display: block;
+    box-shadow: var(--shadow-icon);
+  }
+  .dock a.is-off img { filter: grayscale(1); opacity: .55; }
+  .dock a.is-off { color: var(--muted); }
   .tip {
-    display: inline-flex; align-items: flex-start; gap: 8px; text-align: left;
-    margin-top: 16px; padding: 8px 12px; border-radius: 999px;
-    background: var(--chip); color: var(--ink-2); font-size: 13px;
+    display: inline-flex; align-items: flex-start; gap: 8px;
+    margin-top: 10px; color: var(--muted); font-size: 12.5px; line-height: 1.5;
   }
-  .tip svg { flex: none; margin-top: 3px; }
+  .tip svg { flex: none; margin-top: 2px; }
+  @media (hover: hover) and (pointer: fine) {
+    .dock a { transition: transform 160ms var(--ease-out); }
+    .dock a:hover { transform: translateY(-3px); }
+    .dock a:hover:active { transform: translateY(-3px) scale(.94); }
+  }
 
   /* ---- sections ---- */
   h2 {
-    font-family: "Bricolage Grotesque", "Gothic A1", sans-serif;
-    font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--muted); margin: 36px 0 14px; display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-mono);
+    font-weight: 500; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--muted); margin: 40px 0 14px; display: flex; align-items: center; gap: 12px;
   }
   h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .note {
+    display: flex; gap: 10px; align-items: flex-start;
+    margin: -2px 0 14px; padding: 12px 14px; border-radius: 14px;
+    border: 1px dashed var(--line-2); color: var(--ink-2); font-size: 13.5px; line-height: 1.55;
+  }
+  .note svg { flex: none; margin-top: 3px; color: var(--muted); }
+  .note p { margin: 0; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  @media (min-width: 660px) { .grid > .card:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+  .chip.tool { background: transparent; border: 1px solid var(--line); color: var(--muted); }
 
   /* ---- card ---- */
   .card {
+    --accent: var(--muted);
     position: relative; display: flex; flex-direction: column; gap: 14px;
     background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
-    padding: 18px; box-shadow: var(--shadow);
+    padding: 20px; box-shadow: var(--shadow);
     text-decoration: none;
-    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    transition: transform 160ms var(--ease-out), border-color 200ms ease, box-shadow 200ms ease;
+    animation: rise 280ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
   }
-  a.card:hover, a.card:focus-visible { transform: translateY(-2px); border-color: var(--line-2); outline: none; }
-  a.card:active { transform: translateY(0); transition-duration: .06s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+  a.card:active { transform: scale(.985); }
+  a.card:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  @media (hover: hover) and (pointer: fine) {
+    a.card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+    a.card:hover .arrow { transform: translate(2px, -2px); color: var(--ink); }
+  }
+  .card.is-flat { box-shadow: none; background: color-mix(in srgb, var(--card) 55%, var(--paper)); }
   .card.is-muted { background: transparent; box-shadow: none; }
-  .card.is-muted .icon { filter: grayscale(1); opacity: .7; }
+  .card.is-muted .icon { filter: grayscale(1); opacity: .65; }
 
   .top { display: flex; align-items: center; gap: 12px; }
   .icon {
@@ -104,133 +185,258 @@
     border: 1px solid var(--line); object-fit: cover; background: var(--chip);
     display: grid; place-items: center; color: var(--ink-2);
   }
-  .name { font-family: "Bricolage Grotesque", "Gothic A1", sans-serif; font-weight: 700; font-size: 19px; line-height: 1.15; letter-spacing: -.01em; }
-  .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
-  .arrow { margin-left: auto; color: var(--muted); flex: none; transition: transform .18s ease, color .18s ease; }
-  a.card:hover .arrow { transform: translate(2px, -2px); color: var(--ink); }
+  img.icon { border: 0; box-shadow: var(--shadow-icon); }
+  .name { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: -.015em; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .arrow { margin-left: auto; color: var(--muted); flex: none; transition: transform 160ms var(--ease-out), color 160ms ease; }
 
   .desc { margin: 0; color: var(--ink-2); font-size: 14.5px; }
   .desc strong { color: var(--ink); font-weight: 700; }
 
   .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
   .chip {
-    font-size: 11.5px; line-height: 1; padding: 6px 8px; border-radius: 999px;
-    background: var(--chip); color: var(--ink-2); white-space: nowrap;
+    font-family: var(--font-mono); font-size: 11px; line-height: 1; padding: 6px 8px; border-radius: 7px;
+    background: var(--chip); color: var(--ink-2); white-space: nowrap; letter-spacing: 0;
   }
-  .chip.badge { background: var(--ink); color: var(--paper); }
-  .chip.badge.warn { background: transparent; color: var(--muted); border: 1px dashed var(--line-2); }
-  .chip.badge.lock { background: transparent; color: var(--ink-2); border: 1px solid var(--line-2); display: inline-flex; align-items: center; gap: 4px; }
+  .chip.badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: 1px solid var(--line-2); color: var(--ink);
+  }
+  .chip.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .chip.badge.warn { border-style: dashed; color: var(--muted); }
+  .chip.badge.warn::before { background: transparent; border: 1.5px solid var(--muted); width: 5px; height: 5px; }
+  .chip.badge.lock { gap: 4px; color: var(--ink-2); }
+  .chip.badge.lock::before { display: none; }
 
   /* ---- footer ---- */
-  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
-  footer a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--line-2); }
+  footer { margin-top: 52px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  footer a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--line-2); transition: color 160ms ease, border-color 160ms ease; }
   footer a:hover { color: var(--ink); border-color: var(--ink); }
 
-  @media (prefers-reduced-motion: reduce) { .card, .arrow { transition: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation: none; }
+    .card, .arrow, .dock a, .lang .thumb, .lang button { transition: none; }
+    a.card:hover, .dock a:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">nij-621 · Vienna</p>
-  <h1>필요해서 직접 만든<br><mark>작은 앱들</mark></h1>
-  <p class="lede">회사 일과 집안일에서 반복되는 불편을 하나씩 앱으로 풀었습니다. 설치·가입 없이 링크를 누르면 바로 열리고, 데이터는 서버가 아니라 내 기기에 남습니다.</p>
-  <div class="tip">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
-    <span>아이폰은 사파리에서 공유 → <b>홈 화면에 추가</b>하면 앱처럼 쓸 수 있어요</span>
+  <div class="topbar">
+    <p class="eyebrow">nij-621 · Vienna</p>
+    <div class="lang" role="group" aria-label="Language">
+      <span class="thumb" aria-hidden="true"></span>
+      <button type="button" data-set-lang="ko" aria-pressed="true">한국어</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+  <h1 class="i18n" data-en="Small apps I built<br><mark>because I needed them</mark>">필요해서 직접 만든<br><mark>작은 앱들</mark></h1>
+  <p class="lede i18n" data-en="Each one fixes something that kept bugging me at work or at home. No install, no sign-up: tap a link and it opens. Your data stays on your device.">일하다가, 살림하다가 자꾸 걸리던 것들을 앱으로 하나씩 풀었습니다. 설치도 가입도 없이 링크만 누르면 열려요. 데이터는 내 기기에만 남습니다.</p>
+
+  <div class="dock-wrap">
+    <nav class="dock" aria-label="Quick launch">
+      <a href="https://nij-621.github.io/haru-doing/"><img src="icons/harudoing.png" alt="" width="58" height="58"><span class="i18n" data-en="HaruDoing">하루두잉</span></a>
+      <a href="https://nij-621.github.io/pairfolio/"><img src="icons/pairfolio.png" alt="" width="58" height="58"><span>Pairfolio</span></a>
+      <a href="https://nij-621.github.io/protokoll/"><img src="icons/meetmemo.png" alt="" width="58" height="58"><span>MeetMemo</span></a>
+      <a href="https://nij-621.github.io/recap/"><img src="icons/recap.png" alt="" width="58" height="58"><span>Recap</span></a>
+      <a href="https://prompt-vault-nim670.vercel.app/"><img src="icons/promptvault.png" alt="" width="58" height="58"><span>Prompt Vault</span></a>
+      <a href="https://structural-stylist-ai-222757354900.europe-west1.run.app/"><img src="icons/stylist.svg" alt="" width="58" height="58"><span>Stylist AI</span></a>
+      <a href="https://fitlog-222757354900.us-west1.run.app/"><img src="icons/fitlog.png" alt="" width="58" height="58"><span>FitLog</span></a>
+      <a class="is-off" href="https://nij-621.github.io/sayfirst/"><img src="icons/sayfirst.png" alt="" width="58" height="58"><span>SayFirst</span></a>
+      <a class="is-off" href="https://klar-a2-oeif.vercel.app/"><img src="icons/klar.png" alt="" width="58" height="58"><span>Klar A2</span></a>
+    </nav>
+    <div class="tip">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+      <span class="i18n" data-en="On iPhone: Safari → Share → <b>Add to Home Screen</b> to use it like an app">아이폰은 사파리에서 공유 → <b>홈 화면에 추가</b>하면 앱처럼 쓸 수 있어요</span>
+    </div>
   </div>
 </header>
 
-<h2>쓰는 중</h2>
+<h2 class="i18n" data-en="In daily use">쓰는 중</h2>
 <div class="grid">
 
-  <a class="card" href="https://nij-621.github.io/haru-doing/">
+  <a class="card" style="--accent:#f0704a; --i:0" href="https://nij-621.github.io/haru-doing/">
     <div class="top">
       <img class="icon" src="icons/harudoing.png" alt="" width="52" height="52">
-      <div><div class="name">하루두잉</div><div class="sub">HaruDoing · 데일리 플래너</div></div>
+      <div><div class="name i18n" data-en="HaruDoing">하루두잉</div><div class="sub i18n" data-en="Daily planner">HaruDoing · 데일리 플래너</div></div>
       <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
     </div>
-    <p class="desc"><strong>오늘 할 일과 하루 시간표를 한 화면에.</strong> 못 끝낸 일은 다음 날로 자동으로 넘어가고, 한 줄 일기와 기분을 함께 남깁니다. 종이 불렛저널의 느낌을 앱으로.</p>
-    <div class="meta"><span class="chip badge">2026.07 ~ 매일 사용</span><span class="chip">기기 저장</span><span class="chip">오프라인</span><span class="chip">PWA</span></div>
+    <p class="desc i18n" data-en="<strong>Today's to-dos and timeline, on one screen.</strong> Unfinished tasks move to tomorrow. Add a one-line note and a mood for the day."><strong>오늘 할 일과 시간표가 한 화면에.</strong> 못 끝낸 일은 내일로 넘어갑니다. 하루 한 줄 일기와 기분도 남겨요.</p>
+    <div class="meta"><span class="chip badge i18n" data-en="Jul 2026 → daily">2026.07 → 매일 사용</span><span class="chip i18n" data-en="on-device">기기 저장</span><span class="chip i18n" data-en="offline">오프라인</span><span class="chip">PWA</span><span class="chip tool">Claude Code</span></div>
   </a>
 
-  <a class="card" href="https://nij-621.github.io/pairfolio/">
+  <a class="card" style="--accent:#0e6b4a; --i:1" href="https://nij-621.github.io/pairfolio/">
     <div class="top">
       <img class="icon" src="icons/pairfolio.png" alt="" width="52" height="52">
-      <div><div class="name">Pairfolio</div><div class="sub">부부 가계부</div></div>
+      <div><div class="name">Pairfolio</div><div class="sub i18n" data-en="Shared household ledger">부부 가계부</div></div>
       <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
     </div>
-    <p class="desc"><strong>둘이 같은 장부를 실시간으로.</strong> 유로·원화 자동 환산, 매달 반복되는 지출은 알아서 기입, 자산 월별 기록까지. 8년치 엑셀 가계부를 그대로 옮겨 왔습니다.</p>
-    <div class="meta"><span class="chip badge">2026.09 ~ 유일한 장부</span><span class="chip badge lock"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>초대된 2명만</span><span class="chip">Supabase</span><span class="chip">PWA</span></div>
+    <p class="desc i18n" data-en="<strong>One household ledger, shared live by two people.</strong> Converts EUR and KRW, posts monthly bills automatically, tracks assets month by month."><strong>부부가 같은 가계부를 실시간으로 씁니다.</strong> 유로·원화 자동 환산, 매달 나가는 돈은 자동 기입, 자산은 월별로 기록.</p>
+    <div class="meta"><span class="chip badge i18n" data-en="Sep 2026 → sole ledger">2026.09 → 유일한 장부</span><span class="chip badge lock"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="i18n" data-en="invite-only · 2">초대된 2명만</span></span><span class="chip">Supabase</span><span class="chip">PWA</span><span class="chip tool">Claude Code</span></div>
   </a>
 
-  <a class="card" href="https://nij-621.github.io/protokoll/">
+  <a class="card" style="--accent:#5a7a2e; --i:2" href="https://nij-621.github.io/protokoll/">
     <div class="top">
       <img class="icon" src="icons/meetmemo.png" alt="" width="52" height="52">
-      <div><div class="name">MeetMemo</div><div class="sub">회의 녹음 → 대본 · 회의록</div></div>
+      <div><div class="name">MeetMemo</div><div class="sub i18n" data-en="Meeting audio → transcript & minutes">회의 녹음 → 대본 · 회의록</div></div>
       <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
     </div>
-    <p class="desc"><strong>한·영·독이 섞인 회의를 녹음하면 화자별 대본으로.</strong> 내 발언은 따로 표시되고, 정해진 형식의 회의록까지 뽑아 줍니다. AI 키는 내 폰에만 저장됩니다.</p>
-    <div class="meta"><span class="chip badge">2026.08 ~</span><span class="chip">Gemini · 내 키</span><span class="chip">다국어</span><span class="chip">PWA</span></div>
+    <p class="desc i18n" data-en="<strong>Record a meeting, get who said what as text.</strong> Korean, English and German mixed is fine. It marks my own lines and drafts the minutes. The AI key stays on my phone."><strong>회의를 녹음하면 누가 뭐라 했는지 글로 정리됩니다.</strong> 한·영·독이 섞여도 됩니다. 내 발언은 따로 표시되고 회의록도 만들어 줘요. AI 키는 내 폰에만.</p>
+    <div class="meta"><span class="chip badge i18n" data-en="Aug 2026 →">2026.08 →</span><span class="chip i18n" data-en="Gemini · own key">Gemini · 내 키</span><span class="chip i18n" data-en="multilingual">다국어</span><span class="chip">PWA</span><span class="chip tool">Claude Code</span></div>
   </a>
 
-  <a class="card" href="https://nij-621.github.io/recap/">
+  <a class="card" style="--accent:#f2d600; --i:3" href="https://nij-621.github.io/recap/">
     <div class="top">
       <img class="icon" src="icons/recap.png" alt="" width="52" height="52">
-      <div><div class="name">Recap</div><div class="sub">유튜브 링크 → 결론 먼저</div></div>
+      <div><div class="name">Recap</div><div class="sub i18n" data-en="YouTube link → conclusion first">유튜브 링크 → 결론 먼저</div></div>
       <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
     </div>
-    <p class="desc"><strong>긴 영상, 결론부터 읽기.</strong> 링크를 붙여넣으면 핵심 주장과 근거를 한국어로 정리하고, 원하는 장면은 타임스탬프로 바로 갑니다.</p>
-    <div class="meta"><span class="chip badge">2026.08 ~</span><span class="chip">Gemini · 내 키</span><span class="chip">서버 없음</span><span class="chip">PWA</span></div>
+    <p class="desc i18n" data-en="<strong>Long YouTube video? Read the conclusion first.</strong> Paste a link to get the main points and evidence, with timestamps that jump to the moment."><strong>긴 유튜브 영상, 결론부터 읽습니다.</strong> 링크를 붙여넣으면 핵심 주장과 근거를 정리하고, 타임스탬프로 그 장면에 바로 갑니다.</p>
+    <div class="meta"><span class="chip badge i18n" data-en="Aug 2026 →">2026.08 →</span><span class="chip i18n" data-en="Gemini · own key">Gemini · 내 키</span><span class="chip i18n" data-en="no server">서버 없음</span><span class="chip">PWA</span><span class="chip tool">Claude Code</span></div>
+  </a>
+
+  <a class="card" style="--accent:#d9694a; --i:4" href="https://prompt-vault-nim670.vercel.app/">
+    <div class="top">
+      <img class="icon" src="icons/promptvault.png" alt="" width="52" height="52">
+      <div><div class="name">Prompt Vault</div><div class="sub i18n" data-en="My prompt library">프롬프트 보관함</div></div>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+    </div>
+    <p class="desc i18n" data-en="<strong>All my go-to prompts in one place.</strong> 140 of them, sorted, searchable, starred. Copy one and paste it where you need it."><strong>자주 쓰는 프롬프트를 한 곳에.</strong> 140개를 분류·검색·즐겨찾기. 복사해서 바로 붙여 넣습니다.</p>
+    <div class="meta"><span class="chip badge i18n" data-en="Jun 2026 →">2026.06 →</span><span class="chip badge lock"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="i18n" data-en="owner only">나만 접속</span></span><span class="chip i18n" data-en="on-device">기기 저장</span><span class="chip tool">Claude</span></div>
+  </a>
+
+  <a class="card" style="--accent:#8a6a55; --i:5" href="https://structural-stylist-ai-222757354900.europe-west1.run.app/">
+    <div class="top">
+      <img class="icon" src="icons/stylist.svg" alt="" width="52" height="52">
+      <div><div class="name">Stylist AI</div><div class="sub i18n" data-en="Will this fit my body shape?">이 옷, 내 체형에 맞을까</div></div>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+    </div>
+    <p class="desc i18n" data-en="<strong>Checks a garment against my body shape.</strong> Enter the measurements and a photo; it scores the proportions and says buy or skip."><strong>옷이 내 체형에 어울리는지 판정.</strong> 치수와 사진을 넣으면 비율을 따져서 살지 말지 점수로 답합니다.</p>
+    <div class="meta"><span class="chip badge i18n" data-en="Apr 2026 →">2026.04 →</span><span class="chip">Gemini</span><span class="chip i18n" data-en="photo analysis">사진 분석</span><span class="chip tool">Google AI Studio</span></div>
+  </a>
+
+  <a class="card" style="--accent:#5fae64; --i:6" href="https://fitlog-222757354900.us-west1.run.app/">
+    <div class="top">
+      <img class="icon" src="icons/fitlog.png" alt="" width="52" height="52">
+      <div><div class="name">FitLog</div><div class="sub i18n" data-en="Workout journal">운동 일지</div></div>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+    </div>
+    <p class="desc i18n" data-en="<strong>Log a workout by type, time and intensity.</strong> A calendar and monthly stats show the pattern at a glance."><strong>운동을 종류·시간·강도로 간단히 기록.</strong> 달력과 월별 통계로 흐름이 한눈에 보입니다.</p>
+    <div class="meta"><span class="chip badge i18n" data-en="Mar 2026 →">2026.03 →</span><span class="chip i18n" data-en="on-device">기기 저장</span><span class="chip">PWA</span><span class="chip tool">Google AI Studio</span></div>
   </a>
 
 </div>
 
-<h2>회사 PC 전용</h2>
+<h2 class="i18n" data-en="Work PC only">회사 PC 전용</h2>
+<div class="note">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  <p class="i18n" data-en="These run only on my work PC, as a single offline file. Nothing from work leaves that computer. So there's no link here, just a short description.">회사 PC 안에서만 여는 파일 하나짜리 도구입니다. 인터넷 없이 돌아가서 회사 정보가 밖으로 나가지 않아요. 그래서 링크 없이 소개만 있습니다.</p>
+</div>
 <div class="grid">
 
-  <div class="card">
+  <div class="card is-flat" style="--i:7">
     <div class="top">
       <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
-      <div><div class="name">Minutes</div><div class="sub">회의록 보관 · 검색</div></div>
+      <div><div class="name">Minutes</div><div class="sub i18n" data-en="Meeting minutes archive & search">회의록 보관 · 검색</div></div>
     </div>
-    <p class="desc"><strong>흩어진 회의록을 한 형식으로 모아 사람·주제·기간으로 찾기.</strong> 다음 회의 전에 "지난번 이 사람과 이 주제에서 뭘 정했지?"를 2분 안에 복기합니다. MeetMemo와 같은 회의록 형식을 씁니다.</p>
-    <div class="meta"><span class="chip badge warn">링크 없음 · 회사 내부용</span><span class="chip">파일 하나</span><span class="chip">네트워크 없음</span></div>
+    <p class="desc i18n" data-en="<strong>All meeting minutes in one place, searchable by person, topic and date.</strong> Before the next meeting: &ldquo;What did we decide last time?&rdquo; answered in two minutes."><strong>회의록을 한 곳에 모아 사람·주제·날짜로 찾습니다.</strong> 다음 회의 전에 "지난번에 뭘 정했지?"를 2분 안에 확인.</p>
+    <div class="meta"><span class="chip badge warn i18n" data-en="no link · internal">링크 없음 · 회사 내부용</span><span class="chip i18n" data-en="single file">파일 하나</span><span class="chip i18n" data-en="no network">네트워크 없음</span><span class="chip tool">Claude Code</span></div>
   </div>
 
-  <div class="card">
+  <div class="card is-flat" style="--i:8">
     <div class="top">
       <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></svg></div>
-      <div><div class="name">Work Log</div><div class="sub">업무 로그 · 투두 · 시간 비중</div></div>
+      <div><div class="name">Work Log</div><div class="sub i18n" data-en="Work log · to-dos · time split">업무 로그 · 투두 · 시간 비중</div></div>
     </div>
-    <p class="desc"><strong>한 줄 입력으로 끝낸 일을 쌓고, 연말엔 자동 집계.</strong> 워드 파일과 손글씨 노트를 대체합니다. 업무 종류별 시간 비중이 평가와 업무 조정의 근거가 됩니다.</p>
-    <div class="meta"><span class="chip badge warn">링크 없음 · 회사 내부용</span><span class="chip">파일 하나</span><span class="chip">네트워크 없음</span></div>
+    <p class="desc i18n" data-en="<strong>Log a finished task in one line; the year-end summary builds itself.</strong> Replaces a Word file and a paper notebook. Also shows how my time splits across task types."><strong>끝낸 일을 한 줄로 적어 두면 연말에 자동으로 정리됩니다.</strong> 워드 파일과 손글씨 노트를 대체. 업무별 시간 비중도 나옵니다.</p>
+    <div class="meta"><span class="chip badge warn i18n" data-en="no link · internal">링크 없음 · 회사 내부용</span><span class="chip i18n" data-en="single file">파일 하나</span><span class="chip i18n" data-en="no network">네트워크 없음</span><span class="chip tool">Claude Code</span></div>
   </div>
 
 </div>
 
-<h2>보관</h2>
+<h2 class="i18n" data-en="Shelved">보관</h2>
 <div class="grid">
 
-  <a class="card is-muted" href="https://nij-621.github.io/sayfirst/">
+  <a class="card is-muted" style="--accent:#003459; --i:9" href="https://nij-621.github.io/sayfirst/">
     <div class="top">
       <img class="icon" src="icons/sayfirst.png" alt="" width="52" height="52">
-      <div><div class="name">SayFirst</div><div class="sub">결론 먼저 말하기 훈련</div></div>
+      <div><div class="name">SayFirst</div><div class="sub i18n" data-en="Practice saying the point first">결론 먼저 말하기 훈련</div></div>
       <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
     </div>
-    <p class="desc"><strong>매일 1분, 결론부터 말하는 연습.</strong> 만들어 써 봤지만 가상의 상황으로 연습하는 건 실제 회의 발언에 도움이 되지 않아 접었습니다. 지금은 MeetMemo의 실제 발언 기록으로 코칭받는 방식으로 대체.</p>
-    <div class="meta"><span class="chip badge warn">2026.08 보관</span><span class="chip">Gemini · 내 키</span><span class="chip">PWA</span></div>
+    <p class="desc i18n" data-en="<strong>One minute a day, practising to say the conclusion first.</strong> Tried it. Practice on made-up scenarios didn't help in real meetings, so I shelved it. Now I get coaching on real meeting transcripts instead."><strong>하루 1분, 결론부터 말하는 연습.</strong> 써 봤지만 가상 상황 연습은 실제 회의에 도움이 안 돼서 접었습니다. 지금은 실제 회의 발언으로 코칭받습니다.</p>
+    <div class="meta"><span class="chip badge warn i18n" data-en="shelved Aug 2026">2026.08 보관</span><span class="chip i18n" data-en="Gemini · own key">Gemini · 내 키</span><span class="chip">PWA</span><span class="chip tool">Claude Code</span></div>
+  </a>
+
+  <a class="card is-muted" style="--accent:#0f3d33; --i:10" href="https://klar-a2-oeif.vercel.app/">
+    <div class="top">
+      <img class="icon" src="icons/klar.png" alt="" width="52" height="52">
+      <div><div class="name">Klar A2</div><div class="sub i18n" data-en="ÖIF A2 exam coach">ÖIF A2 시험 코치</div></div>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+    </div>
+    <p class="desc i18n" data-en="<strong>Study coach for the ÖIF A2 integration exam.</strong> Plans today's study around the exam date. Covers grammar, vocabulary, listening, speaking and Wertewissen."><strong>ÖIF A2 통합시험 학습 코치.</strong> 시험일에 맞춰 오늘 할 공부를 짜 줍니다. 문법·어휘·듣기·말하기·Wertewissen 전 범위.</p>
+    <div class="meta"><span class="chip badge warn i18n" data-en="shelved · Jul 2026">2026.07 보관</span><span class="chip i18n" data-en="on-device">기기 저장</span><span class="chip">PWA</span><span class="chip tool">ChatGPT Codex</span></div>
   </a>
 
 </div>
 
 <footer>
-  <span>모든 앱은 서버 없이 정적 페이지로 돌아가고 GitHub Pages에 올려져 있습니다.</span>
-  <span>Claude Code로 만듦 · 2026</span>
+  <span class="i18n" data-en="All apps are static pages with no backend, hosted on GitHub Pages.">모든 앱은 서버 없이 정적 페이지로 돌아가고 GitHub Pages에 올려져 있습니다.</span>
+  <span class="i18n" data-en="Built with Claude Code, Claude, ChatGPT and Google AI Studio · 2026">Claude Code · Claude · ChatGPT · Google AI Studio로 만듦 · 2026</span>
   <a href="https://github.com/nij-621">github.com/nij-621</a>
 </footer>
 
 </div>
+
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.i18n');
+  nodes.forEach(function (n) { n.dataset.ko = n.innerHTML; });
+  var btns = document.querySelectorAll('[data-set-lang]');
+  var thumb = document.querySelector('.lang .thumb');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function moveThumb(lang) {
+    var b = document.querySelector('[data-set-lang="' + lang + '"]');
+    if (!b || !thumb) return;
+    thumb.style.width = b.offsetWidth + 'px';
+    thumb.style.transform = 'translateX(' + b.offsetLeft + 'px)';
+  }
+
+  function render(lang) {
+    nodes.forEach(function (n) { n.innerHTML = lang === 'en' ? n.dataset.en : n.dataset.ko; });
+    document.documentElement.lang = lang;
+    document.title = lang === 'en' ? 'Apps by nij-621' : 'nij-621의 앱들';
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.setLang === lang)); });
+    moveThumb(lang);
+    try { localStorage.setItem('lang', lang); } catch (e) {}
+  }
+
+  function apply(lang, animate) {
+    if (!animate || reduce) { render(lang); return; }
+    document.body.classList.add('swapping');
+    setTimeout(function () {
+      render(lang);
+      requestAnimationFrame(function () { document.body.classList.remove('swapping'); });
+    }, 90);
+  }
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (b.getAttribute('aria-pressed') === 'true') return;
+      apply(b.dataset.setLang, true);
+    });
+  });
+
+  var q = new URLSearchParams(location.search).get('lang');
+  var saved = null; try { saved = localStorage.getItem('lang'); } catch (e) {}
+  var lang = q || saved || (navigator.language && navigator.language.toLowerCase().indexOf('ko') === 0 ? 'ko' : 'en');
+  if (lang !== 'ko' && lang !== 'en') lang = 'en';
+  apply(lang, false);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { moveThumb(document.documentElement.lang); });
+  addEventListener('resize', function () { moveThumb(document.documentElement.lang); });
+})();
+</script>
 </body>
 </html>
