@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>nij-621의 앱들</title>
+<meta name="description" content="필요해서 직접 만든 앱 하나의 이야기: 왜 만들었고, 뭘로 만들었고, 지금도 쓰는지.">
+<meta name="theme-color" content="#f8f7f3">
+<link rel="icon" href="icons/app-64.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/app-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Gothic+A1:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* 토큰은 index.html과 같게 유지할 것 */
+  :root {
+    --paper: #f8f7f3;
+    --card: #ffffff;
+    --ink: #1a1a18;
+    --ink-2: #4b4a46;
+    --muted: #7d7c76;
+    --line: #e7e5df;
+    --line-2: #d5d2ca;
+    --chip: #f1f0ea;
+    --shadow: 0 1px 2px rgba(20,18,10,.04), 0 10px 28px -14px rgba(20,18,10,.14);
+    --shadow-icon: 0 1px 1px rgba(20,18,10,.06), 0 6px 14px -6px rgba(20,18,10,.28);
+    --r: 20px;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --font-display: "Bricolage Grotesque", "Gothic A1", system-ui, sans-serif;
+    --font-body: "Gothic A1", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", "Gothic A1", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #151517;
+      --card: #1e1e22;
+      --ink: #f1f0ea;
+      --ink-2: #c8c7c0;
+      --muted: #8d8c86;
+      --line: #2b2b30;
+      --line-2: #3b3b42;
+      --chip: #28282d;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+      --shadow-icon: 0 1px 1px rgba(0,0,0,.4), 0 6px 14px -6px rgba(0,0,0,.7);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    word-break: keep-all;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(48px, env(safe-area-inset-bottom));
+  }
+  html[lang="en"] body { word-break: normal; }
+  a { color: inherit; }
+  .wrap { --accent: var(--muted); max-width: 560px; margin: 0 auto; display: grid; gap: 18px; }
+
+  .i18n { transition: opacity 150ms ease, filter 150ms ease; }
+  body.swapping .i18n { opacity: .55; filter: blur(2px); }
+
+  /* ---- top bar ---- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding-right: 8px;
+    text-decoration: none; color: var(--ink-2); font-size: 13.5px; font-weight: 700;
+    transition: color 160ms ease;
+  }
+  .back:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 8px; }
+  @media (hover: hover) and (pointer: fine) { .back:hover { color: var(--ink); } }
+  .lang {
+    position: relative; display: inline-flex; padding: 3px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow);
+  }
+  .lang .thumb {
+    position: absolute; top: 3px; left: 0; height: calc(100% - 6px); width: 0;
+    border-radius: 999px; background: var(--ink);
+    transition: transform 180ms var(--ease-out), width 180ms var(--ease-out);
+  }
+  .lang button {
+    position: relative; z-index: 1;
+    appearance: none; border: 0; background: transparent; cursor: pointer;
+    font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .03em;
+    color: var(--muted); padding: 6px 11px; border-radius: 999px; line-height: 1;
+    transition: color 180ms ease, transform 120ms var(--ease-out);
+  }
+  .lang button[aria-pressed="true"] { color: var(--paper); }
+  .lang button:active { transform: scale(.96); }
+  .lang button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* ---- head ---- */
+  .head { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+  .head img { width: 64px; height: 64px; border-radius: 17px; flex: none; box-shadow: var(--shadow-icon); }
+  h1 {
+    font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 8vw, 38px);
+    line-height: 1.05; letter-spacing: -.025em; margin: 0;
+    font-variation-settings: "opsz" 96;
+  }
+  .sub { color: var(--muted); font-size: 13.5px; margin-top: 4px; }
+  .desc { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+  .desc strong { color: var(--ink); font-weight: 700; }
+
+  /* ---- film (세로 영상) ---- */
+  .film-wrap { display: grid; justify-items: center; gap: 10px; padding: 18px 16px 12px; border-radius: var(--r); background: var(--chip); }
+  .film { display: block; width: min(100%, 250px); aspect-ratio: 9 / 16; border-radius: 18px; background: #111; box-shadow: var(--shadow-icon); }
+  .film-cap { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin: 0; }
+
+  .open-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px;
+    border-radius: 14px; background: var(--ink); color: var(--paper); text-decoration: none;
+    font-weight: 700; font-size: 15px;
+    transition: transform 120ms var(--ease-out);
+  }
+  .open-btn:active { transform: scale(.98); }
+  .open-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  /* ---- story ---- */
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); }
+  h2 {
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 16px; display: flex; align-items: center; gap: 12px;
+  }
+  h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .story { margin: 0; display: grid; gap: 16px; }
+  .story dt {
+    font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .02em; color: var(--muted);
+    display: flex; align-items: center; gap: 7px; margin-bottom: 3px;
+  }
+  .story dt::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .story dd { margin: 0; color: var(--ink-2); font-size: 15px; }
+  .story dd b { color: var(--ink); font-weight: 700; }
+
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: var(--font-mono); font-size: 11px; line-height: 1; padding: 6px 8px; border-radius: 7px;
+    background: var(--chip); color: var(--ink-2); white-space: nowrap;
+  }
+  .chip.badge { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--line-2); color: var(--ink); }
+  .chip.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .chip.tool { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+
+  /* ---- prev / next (이야기가 있는 앱끼리) ---- */
+  .nav { display: flex; justify-content: space-between; gap: 12px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; }
+  .nav:empty { display: none; }
+  .nav a { text-decoration: none; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; min-height: 44px; transition: color 160ms ease; }
+  .nav a.next { margin-left: auto; text-align: right; }
+  .nav small { display: block; font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); line-height: 1.2; }
+  .nav a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 8px; }
+  @media (hover: hover) and (pointer: fine) { .nav a:hover { color: var(--ink); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .i18n, .lang .thumb, .lang button, .open-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap" id="wrap" hidden>
+
+  <div class="topbar">
+    <a class="back" href="./">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span class="i18n" id="t-back"></span>
+    </a>
+    <div class="lang" role="group" aria-label="Language">
+      <span class="thumb" aria-hidden="true"></span>
+      <button type="button" data-set-lang="ko" aria-pressed="true">한국어</button>
+      <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+  <div class="head">
+    <img id="icon" alt="" width="64" height="64">
+    <div><h1 class="i18n" id="t-name"></h1><div class="sub i18n" id="t-sub"></div></div>
+  </div>
+  <p class="desc i18n" id="t-desc"></p>
+
+  <div class="film-wrap" id="film-wrap">
+    <video class="film" id="film" controls playsinline preload="none"></video>
+    <p class="film-cap i18n" id="t-cap"></p>
+  </div>
+
+  <a class="open-btn" id="open" target="_blank" rel="noopener">
+    <span class="i18n" id="t-open"></span>
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+  </a>
+
+  <section class="panel">
+    <h2 class="i18n" id="t-h2"></h2>
+    <dl class="story i18n" id="story"></dl>
+  </section>
+
+  <div class="meta i18n" id="chips"></div>
+
+  <nav class="nav i18n" id="nav"></nav>
+
+</main>
+
+<script>
+/* 앱 이야기 데이터. 앱을 추가하려면 여기에 한 덩어리를 넣고,
+   index.html의 그 카드 href를 story.html?app=<id>로 바꾼다.
+   순서 = 이전/다음 순서. 글은 [한국어, 영어]. */
+var APPS = {
+  mealcat: {
+    accent: '#e99a90',
+    icon: 'icons/mealcat.png',
+    url: 'https://nij-621.github.io/mealcat/',
+    name: ['Mealcat', 'Mealcat'],
+    sub: ['한 주 식단 · 사진 기록', 'Weekly meal plan · photo log'],
+    desc: [
+      '<strong>한 주 식단을 짜고, 실제로 먹은 건 사진 한 장으로 남깁니다.</strong> 주말에 한 주를 통째로 Claude 코치에게 보내면 다음 주 아이디어가 돌아와요.',
+      '<strong>Plan the week\'s meals, and log what I actually ate with one photo.</strong> Once a week the whole week goes to a Claude coach, and ideas for next week come back.'
+    ],
+    film: { src: ['media/mealcat-ko.mp4', 'media/mealcat-en.mp4'], poster: ['media/mealcat-ko.jpg', 'media/mealcat-en.jpg'], cap: ['30초 소개 영상', '30-second intro'] },
+    chips: [
+      ['2026.10 →', 'Oct 2026 →', 'badge'],
+      ['기기 저장', 'on-device', ''],
+      ['PWA', 'PWA', ''],
+      ['Claude Code', 'Claude Code', 'tool']
+    ],
+    story: [
+      [['왜 만들었나', 'Why I built it'],
+       ['주말마다 다음 주 식단을 메모앱에 적어 왔어요. 4년쯤 됐어요. 그런데 <b>계획만 남고 실제로 뭘 먹었는지는 안 남았어요.</b> 계획 옆에 먹은 걸 사진 한 장으로 남기고 싶었어요.',
+        'Every weekend I wrote next week\'s meals in a notes app. I had done that for about four years. <b>The plan stayed, but what I actually ate did not.</b> I wanted one photo of each meal next to the plan.']],
+      [['뭘로 만들었나', 'What I built it with'],
+       ['<b>Claude Code.</b> 저는 개발자가 아니에요. 원하는 걸 말하고, 화면 목업을 먼저 보고 고르고, 써 보고 틀린 곳을 짚었어요. 코드는 AI가 썼어요.',
+        '<b>Claude Code.</b> I am not a developer. I said what I wanted, chose from screen mockups first, used it, and pointed out what was wrong. The AI wrote the code.']],
+      [['얼마나 걸렸나', 'How long it took'],
+       ['2026년 10월 18일에 시작해서 <b>첫 4주 동안 8일</b> 손봤어요. 대부분 주말이에요.',
+        'I started on 18 October 2026 and worked on it on <b>8 days in the first 4 weeks</b>, mostly weekends.']],
+      [['지금도 쓰나', 'Do I still use it?'],
+       ['<b>매일 써요.</b> 끼니마다 사진을 찍고, 주말에 다음 주를 짜요.',
+        '<b>Every day.</b> A photo at each meal, and next week\'s plan on the weekend.']],
+      [['안 넣기로 한 것', 'Left out on purpose'],
+       ['<b>앱 안의 AI와 칼로리 숫자.</b> 사진만으로는 칼로리가 부정확하고, 키와 비용을 관리하기도 싫었어요. 판단은 일주일에 한 번 Claude 코치에게 맡겨요.',
+        '<b>AI inside the app, and calorie numbers.</b> Calories guessed from a photo are not accurate, and I did not want to manage a key and costs. A Claude coach does the judging once a week.']],
+      [['만들었다가 버린 것', 'Built, then removed'],
+       ['<b>로딩 화면의 고양이.</b> 작업이 0.4초 안에 끝나서 한 번도 화면에 안 떴어요. 그래서 뺐어요.',
+        '<b>The cat on the loading screen.</b> The work finished in under 0.4 seconds, so it never once appeared. I took it out.']]
+    ]
+  }
+};
+
+(function () {
+  var UI = {
+    back: ['모든 앱', 'All apps'], open: ['앱 열기', 'Open the app'], h2: ['만든 이야기', 'How it was made'],
+    prev: ['이전', 'Previous'], next: ['다음', 'Next'], title: ['nij-621의 앱들', 'Apps by nij-621']
+  };
+  var q = new URLSearchParams(location.search);
+  var id = q.get('app');
+  var app = APPS[id];
+  if (!app) { location.replace('./'); return; }
+
+  var $ = function (i) { return document.getElementById(i); };
+  var wrap = $('wrap'), film = $('film');
+  var btns = document.querySelectorAll('[data-set-lang]');
+  var thumb = document.querySelector('.lang .thumb');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ids = Object.keys(APPS), at = ids.indexOf(id);
+
+  wrap.style.setProperty('--accent', app.accent);
+  $('icon').src = app.icon;
+  $('open').href = app.url;
+  if (!app.film) $('film-wrap').hidden = true;
+
+  function moveThumb(lang) {
+    var b = document.querySelector('[data-set-lang="' + lang + '"]');
+    if (!b || !thumb) return;
+    thumb.style.width = b.offsetWidth + 'px';
+    thumb.style.transform = 'translateX(' + b.offsetLeft + 'px)';
+  }
+
+  function navLink(otherId, dir, n) {
+    var o = APPS[otherId], name = o.name[n];
+    var chev = dir === 'prev' ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6';
+    var svg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + chev + '"/></svg>';
+    var txt = '<span><small>' + UI[dir][n] + '</small>' + name + '</span>';
+    return '<a class="' + dir + '" href="story.html?app=' + otherId + '">' + (dir === 'prev' ? svg + txt : txt + svg) + '</a>';
+  }
+
+  function render(lang) {
+    var n = lang === 'en' ? 1 : 0;
+    $('t-back').textContent = UI.back[n];
+    $('t-open').textContent = UI.open[n];
+    $('t-h2').textContent = UI.h2[n];
+    $('t-name').textContent = app.name[n];
+    $('t-sub').textContent = app.sub[n];
+    $('t-desc').innerHTML = app.desc[n];
+    $('story').innerHTML = app.story.map(function (r) {
+      return '<div><dt>' + r[0][n] + '</dt><dd>' + r[1][n] + '</dd></div>';
+    }).join('');
+    $('chips').innerHTML = app.chips.map(function (c) {
+      return '<span class="chip' + (c[2] ? ' ' + c[2] : '') + '">' + c[n] + '</span>';
+    }).join('');
+    $('nav').innerHTML = (at > 0 ? navLink(ids[at - 1], 'prev', n) : '') + (at < ids.length - 1 ? navLink(ids[at + 1], 'next', n) : '');
+    if (app.film) {
+      $('t-cap').textContent = app.film.cap[n];
+      film.setAttribute('aria-label', app.name[n] + ' · ' + app.film.cap[n]);
+      if (film.getAttribute('src') !== app.film.src[n]) {
+        film.pause();
+        film.poster = app.film.poster[n];
+        film.src = app.film.src[n];
+      }
+    }
+    document.documentElement.lang = lang;
+    document.title = app.name[n] + ' · ' + UI.title[n];
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.setLang === lang)); });
+    moveThumb(lang);
+    try { localStorage.setItem('lang', lang); } catch (e) {}
+  }
+
+  function apply(lang, animate) {
+    if (!animate || reduce) { render(lang); return; }
+    document.body.classList.add('swapping');
+    setTimeout(function () {
+      render(lang);
+      requestAnimationFrame(function () { document.body.classList.remove('swapping'); });
+    }, 90);
+  }
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (b.getAttribute('aria-pressed') === 'true') return;
+      apply(b.dataset.setLang, true);
+    });
+  });
+
+  var saved = null; try { saved = localStorage.getItem('lang'); } catch (e) {}
+  var lang = q.get('lang') || saved || (navigator.language && navigator.language.toLowerCase().indexOf('ko') === 0 ? 'ko' : 'en');
+  if (lang !== 'ko' && lang !== 'en') lang = 'en';
+  wrap.hidden = false;
+  apply(lang, false);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { moveThumb(document.documentElement.lang); });
+  addEventListener('resize', function () { moveThumb(document.documentElement.lang); });
+})();
+</script>
+</body>
+</html>
